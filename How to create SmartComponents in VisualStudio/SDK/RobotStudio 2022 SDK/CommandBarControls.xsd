@@ -1,0 +1,534 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xs:schema id="CommandBarControls"
+          targetNamespace="urn:abb-robotics-robotstudio-commandbarcontrols"
+          elementFormDefault="qualified"
+          xmlns="urn:abb-robotics-robotstudio-commandbarcontrols"
+          xmlns:mstns="urn:abb-robotics-robotstudio-commandbarcontrols"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:complexType name="TControl">
+    <xs:annotation>
+      <xs:documentation>
+        Adds an existing control to a menu or gallery.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="id" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies the identifier of the existing control.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TSeparator">
+    <xs:annotation>
+      <xs:documentation>
+        Adds a separator to a menu.
+      </xs:documentation>
+    </xs:annotation>
+  </xs:complexType>
+
+  <xs:complexType name="THeader">
+    <xs:annotation>
+      <xs:documentation>
+        Adds a header to a menu or gallery.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="caption" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Header text
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TComboBoxItem">
+    <xs:annotation>
+      <xs:documentation>
+        Specifies a CommandBarComboBoxItem which represents an item in a combobox.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="caption" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies the text to display.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="tag" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies the Tag property of the CommandBarComboBoxItem.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:simpleType name="TTextPos">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NoText">
+        <xs:annotation>
+          <xs:documentation>Text will not be displayed, only the image</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Below">
+        <xs:annotation>
+          <xs:documentation>Text will be displayed below the image</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Right">
+        <xs:annotation>
+          <xs:documentation>Text will be displayed to the right of the image. If the item has a HelpText it will be also be displayed.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+  <xs:complexType name="TCommandBarButton">
+    <xs:annotation>
+      <xs:documentation>
+        Creates a CommandBarButton that represents a button in a menu, toolbar or in the ribbon.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="id" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Globally unique identifier for the object. To ensure uniqueness, use the add-in name as a prefix.
+          The CommandBarButton object can be accessed by calling the CommandBarButton.FromID() method.
+          If an image file with the same name exists in the add-in directory, it is automatically loaded and used as the button image.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="caption" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Text to display on the button.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="keys" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Shortcut key in the form 'Key[, Modifier1[, Modifier2]]', e.g. 'A, Control'
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="displayAsCheckBox" type="xs:boolean" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies if the button should be displayed as a checkbox.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+		<xs:attribute name="imageId" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Alternative name for the image file. 
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="tag" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies the Tag property of the CommandBarButton object.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="defaultEnabled" type="xs:boolean" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies if the button is enabled when it has no subscriber.
+          If true, the add-in is automatically loaded when the button is clicked and the command is executed again.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="licenseFeature" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies the LicenseFeature property of the CommandBarButton object.
+          If the feature is not available, the button is disabled and the screen tip explains why.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="isUndoable" type="xs:boolean" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies the IsUndoable property of the CommandBarControl object.
+          If true, the command will be disabled during undoable operations to prevent nested undo steps.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TCommandBarButtonGroup">
+    <xs:annotation>
+      <xs:documentation>
+        Creates a CommandBarButtonGroup that represents a dynamic set of menu buttons.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="id" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Globally unique identifier for the object. To ensure uniqueness, use the add-in name ID as a prefix.
+          The CommandBarButtonGroup object can be accessed by calling the CommandBarButtonGroup.FromID() method.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="isUndoable" type="xs:boolean" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies the IsUndoable property of the CommandBarControl object.
+          If true, the command will be disabled during undoable operations to prevent nested undo steps.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TCommandBarComboBox">
+    <xs:annotation>
+      <xs:documentation>
+        Creates a CommandBarComboBox that represents a combo box in the ribbon.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Items" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            For adding items to the combo box.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+              <xs:element name="Item" type="TComboBoxItem"></xs:element>
+              <!--xs:element name="Control" type="TControl"></xs:element-->
+            </xs:choice>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Globally unique identifier for the object. To ensure uniqueness, use the add-in name ID as a prefix.
+          The CommandBarComboBox object can be accessed by calling the CommandBarComboBox.FromID() method.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="caption" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Text to display beside the combo box.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="width" type="xs:int" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Width of the combo box.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="isUndoable" type="xs:boolean" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies the IsUndoable property of the CommandBarControl object.
+          If true, the combo box will be disabled during undoable operations to prevent nested undo steps.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TCommandBarCustomControl">
+    <xs:attribute name="id" type="xs:string" use="required"></xs:attribute>
+    <xs:attribute name="caption" type="xs:string" use="optional"></xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TCommandBarPopup">
+    <xs:annotation>
+      <xs:documentation>
+        Creates a CommandBarPopup that represents a popup menu.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Controls">
+        <xs:annotation>
+          <xs:documentation>
+            Specifies the contents of the menu.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+              <xs:element name="Control" type="TControl"></xs:element>
+              <xs:element name="Header" type="THeader"></xs:element>
+              <xs:element name="Separator" type="TSeparator"></xs:element>
+              <xs:element name="CommandBarPopup" type="TCommandBarPopup">
+                <xs:annotation>
+                  <xs:documentation>
+                    Adds an inline popup menu. The id attribute can be empty.
+                  </xs:documentation>
+                </xs:annotation>
+              </xs:element>
+            </xs:choice>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Globally unique identifier for the object. To ensure uniqueness, use the add-in name ID as a prefix.
+          The CommandBarPopup object can be accessed by calling the CommandBarPopup.FromID() method.
+          If an image file with the same name exists in the add-in directory, it is automatically loaded and used as the popup image.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="caption" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Text to display on the popup.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="clickButton" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies the ID of a button whose command will be executed when the button part of the popup is clicked.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="imageId" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Alternative name for the image file. 
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="alwaysEnabled" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          If true, the popup will be enabled even if doesn't contain any enabled items.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="isUndoable" type="xs:boolean" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies the IsUndoable property of the CommandBarControl object.
+          If true, the popup will be disabled during undoable operations to prevent nested undo steps.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="showFilter" type="xs:boolean" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Show a text box for filtering items in the popup.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TCommandBarContextPopup">
+    <xs:annotation>
+      <xs:documentation>
+        Creates a CommandBarContextPopup that represents a context menu popup for a specified selection type.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Controls">
+        <xs:annotation>
+          <xs:documentation>
+            Specifies the contents of the menu.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+              <xs:element name="Control" type="TControl"></xs:element>
+              <xs:element name="Header" type="THeader"></xs:element>
+              <xs:element name="Separator" type="TSeparator"></xs:element>
+              <xs:element name="CommandBarPopup" type="TCommandBarPopup">
+                <xs:annotation>
+                  <xs:documentation>
+                    Adds an inline popup menu. The id attribute can be empty.
+                  </xs:documentation>
+                </xs:annotation>
+              </xs:element>
+            </xs:choice>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Globally unique identifier for the object. To ensure uniqueness, use the add-in name ID as a prefix.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="type" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Name of the type that the menu corresponds to.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="defaultButton" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies the ID of a button which will be displayed in bold font and executed when the selected object is double-clicked.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="caption" type="xs:string" use="optional"></xs:attribute>
+    <xs:attribute name="isUndoable" type="xs:boolean" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies the IsUndoable property of the CommandBarControl object.
+          If true, the popup will be disabled during undoable operations to prevent nested undo steps.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TCommandBarGalleryPopup">
+    <xs:annotation>
+      <xs:documentation>
+        Creates a CommandBarGalleryPopup that represents a popup menu that contains a gallery and optionally menu items.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="GalleryControls">
+        <xs:annotation>
+          <xs:documentation>
+            Specifies the contents of the gallery.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+              <xs:element name="Control" type="TControl"></xs:element>
+              <xs:element name="Header" type="THeader"></xs:element>
+            </xs:choice>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Controls">
+        <xs:annotation>
+          <xs:documentation>
+            Specifies optional menu items to display below the gallery.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+              <xs:element name="Control" type="TControl"></xs:element>
+              <xs:element name="Header" type="THeader"></xs:element>
+              <xs:element name="Separator" type="TSeparator"></xs:element>
+            </xs:choice>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Globally unique identifier for the object. To ensure uniqueness, use the add-in name ID as a prefix.
+          The CommandBarGalleryPopup object can be accessed by calling the CommandBarGalleryPopup.FromID() method.
+          If an image file with the same name exists in the add-in directory, it is automatically loaded and used as the popup image.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="caption" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Text to display on the popup.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="numColumns" type="xs:int" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies the number of columns to display in the gallery. The default is one.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="textPos" type="TTextPos" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies the position of text in relation to each gallery item image.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="clickButton" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          <xs:annotation>
+            <xs:documentation>
+              Specifies the ID of a button whose command will be executed when the button part of the popup is clicked.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="itemWidth" type="xs:int" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies the width of each gallery item.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="itemHeight" type="xs:int" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies the height of each gallery item.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+		<xs:attribute name="imageId" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Alternative name for the image file.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="numTextLines" type="xs:int" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies the number lines for text displayed below the item image
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="isUndoable" type="xs:boolean" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies the IsUndoable property of the CommandBarControl object.
+          If true, the popup will be disabled during undoable operations to prevent nested undo steps.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:element name="CommandBarControls">
+    <xs:annotation>
+      <xs:documentation>
+        For declaring new controls.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="CommandBarButton" type="TCommandBarButton"></xs:element>
+        <xs:element name="CommandBarButtonGroup" type="TCommandBarButtonGroup"></xs:element>
+        <xs:element name="CommandBarPopup" type="TCommandBarPopup"></xs:element>
+        <xs:element name="CommandBarGalleryPopup" type="TCommandBarGalleryPopup"></xs:element>
+        <xs:element name="CommandBarComboBox" type="TCommandBarComboBox"></xs:element>
+        <xs:element name="CommandBarCustomControl" type="TCommandBarCustomControl"></xs:element>
+        <xs:element name="CommandBarContextPopup" type="TCommandBarContextPopup"></xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

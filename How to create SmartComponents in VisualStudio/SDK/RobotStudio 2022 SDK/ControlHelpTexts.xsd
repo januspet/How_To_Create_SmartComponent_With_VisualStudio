@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xs:schema id="ControlHelpTexts"
+            targetNamespace="urn:abb-robotics-robotstudio-controlhelptexts"
+            elementFormDefault="qualified"
+            xmlns="urn:abb-robotics-robotstudio-controlhelptexts"
+            xmlns:mstns="urn:abb-robotics-robotstudio-controlhelptexts"
+            xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="Controls">
+    <xs:annotation>
+      <xs:documentation>
+        For specifying the HelpText property of controls. 
+        It will be displayed in ScreenTips, as well as in CommandBarGalleryPopups with the GalleryTextPosition property set to 'Right'
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Control" minOccurs="0" maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:documentation>
+              Specifies the HelpText property of an existing control.
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType mixed="true">
+            <xs:attribute name="id" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>ID of the control</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+</xs:schema>

@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema
+  targetNamespace="urn:abb-robotics-robotstudio-controllertemplates"
+  elementFormDefault="qualified"
+  xmlns="urn:abb-robotics-robotstudio-controllertemplates"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <!-- Simple types -->
+  <xs:simpleType name="TVersion">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[6-9].[0-9][0-9]?(.[0-9][0-9]?(.[0-9]+_[0-9]+)?)?"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TBaseTemplateType">
+    <xs:annotation>
+      <xs:documentation>Specifies if the features are added per controller or per drive module in a MultiMove system. The default is per drive module.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="controller">
+        <xs:annotation>
+          <xs:documentation>The features are added per controller.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="drivemodule">
+        <xs:annotation>
+          <xs:documentation>The features are added per drive module. This is the default.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TGroupType">
+    <xs:annotation>
+      <xs:documentation>Specifies the type of templates in a group.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="robot">
+        <xs:annotation>
+          <xs:documentation>
+            Robot controller templates. The templates are by default visible when listing controller templates
+            and must be complete, i.e. include RobotWare base features.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="other">
+        <xs:annotation>
+          <xs:documentation>
+            Templates for adding additional mechanisms such as positioners and tracks to a robot controller.
+            The templates are by default not visible when listing controller templates.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="motorUnit">
+        <xs:annotation>
+          <xs:documentation>Internal use</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="gearUnit">
+        <xs:annotation>
+          <xs:documentation>Internal use</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="rttBobin">
+        <xs:annotation>
+          <xs:documentation>Internal use</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TLocation">
+    <xs:annotation>
+      <xs:documentation>Specifies the location of a ConfigurationFile.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="robotware">
+        <xs:annotation>
+          <xs:documentation>The file is located in the RobotWare distribution under the "utility" folder.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="library">
+        <xs:annotation>
+          <xs:documentation>The file is located in ABB Library or in the LibraryComponents package.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Attribute groups -->
+  <xs:attributeGroup name="rwConditions">
+    <xs:attribute name="minVer" type="TVersion" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies the minimum RobotWare version for an element. The element is included if the RobotWare version is <b>equal or higher</b>.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="maxVer" type="TVersion" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies the <b>exclusive</b> maximum RobotWare version for an element. The element is included if the RobotWare version is <b>lower</b>.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+
+  <xs:attributeGroup name="condition">
+    <xs:attribute name="condition" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          A logical expression that determines if the element should be included or ignored.
+          Valid operators are ==, !=, and/&amp;&amp;, or/||, not/! and parantheses for grouping.
+          Variables can be built-in ({gravity_alpha}, {gravity_beta}, {multiplicity}) or come from model name matching or Variable elements.
+          Example: "({type}==STD||{type}==DBL1)and({angle}==0)".
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+
+  <xs:attributeGroup name="visible">
+    <xs:attribute name="visible" type="xs:boolean" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies if the template or group is visible when listing controller templates.
+          The default is true for robot templates and false for other mechanism types.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+
+
+  <!-- Elements -->
+
+  <xs:complexType name="TFeature">
+    <xs:annotation>
+      <xs:documentation>Adds a RobotWare or add-in feature to the controller.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="id" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          The feature id as declared in the product manifest. Can be found in controller.rsf for an existing controller.
+          Variables can be used in the value, for example "abb.robotics.positioner.mtd.positioners.irbp_a.250.d1000.{multiplicity}.typea".
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attributeGroup ref="rwConditions"/>
+    <xs:attributeGroup ref="condition"/>
+    <xs:attribute name="replaces" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>If a feature with this id exists then this feature will replace it, otherwise this feature is removed.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="removes" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>If a feature with this id exists then it will be removed.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TVariable">
+    <xs:annotation>
+      <xs:documentation>Declares a variable that can be referenced in conditions, feature ids or other variable declarations.</xs:documentation>
+    </xs:annotation>
+    <xs:attributeGroup ref="condition"/>
+    <xs:attribute name="name" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>Variable name. The value is referenced in other places by enclosing it in curly brackets like {x}.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="value" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>Variable value. The value can contain other variables and can be a mathematical expression, for example "{length}*10-1".</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TInherits">
+    <xs:annotation>
+      <xs:documentation>Recursively include features from a BaseTemplate.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="baseTemplate" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>The name of the BaseTemplate to include.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+
+  <xs:complexType name="TAddin">
+    <xs:annotation>
+      <xs:documentation>
+        Adds a RobotWare add-in to the controller.
+        If a package containg the add-in is not already installed, it is downloaded from the RobotStudio package repository (CDN).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="id" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>Add-in id</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="version" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>Add-in version</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attributeGroup ref="rwConditions"/>
+  </xs:complexType>
+
+  <xs:complexType name="TConfigurationFile">
+    <xs:annotation>
+      <xs:documentation>Loads a configuration file into the controller.</xs:documentation>
+    </xs:annotation>
+    <xs:attributeGroup ref="rwConditions"/>
+    <xs:attribute name="location" type="TLocation" use="required"/>
+    <xs:attribute name="name" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>The path and/or name of the configuration file.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TBaseTemplate">
+    <xs:annotation>
+      <xs:documentation>
+        A group of features that can be used in other templates.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="Inherits" type="TInherits"/>
+      <xs:element name="Addin" type="TAddin"/>
+      <xs:element name="Feature" type="TFeature"/>
+    </xs:choice>
+    <xs:attribute name="name" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>The name to be used when refering to the base template in an Inherits element.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="type" type="TBaseTemplateType" use="optional"/>
+  </xs:complexType>
+
+  <xs:complexType name="TTemplate">
+    <xs:annotation>
+      <xs:documentation>A grouping of RobotWare features required to build a virtual controller for a mechanism.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="ModelNames">
+        <xs:annotation>
+          <xs:documentation>ModelName elements that specify mechanism models for which this template is used when creating a virtual controller from layout.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="ModelName" type="xs:string">
+              <xs:annotation>
+                <xs:documentation>
+                  Specifies a mechanism model (see Mechanism.ModelName) for which this template is used when creating a virtual controller from layout.
+                  The string can contain wildcards like IRBT4004_*_2__* or matching variables like PAINT_RAIL_{x}_{length}_{angle}.
+                  Matched variables can be used in conditions ("{x}==0"), feature ids ("a.b.c.irb000_{x}") or Variable declarations.
+                </xs:documentation>
+              </xs:annotation>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="Inherits" type="TInherits"/>
+        <xs:element name="Addin" type="TAddin"/>
+        <xs:element name="Variable" type="TVariable"/>
+        <xs:element name="Feature" type="TFeature"/>
+        <xs:element name="ConfigurationFile" type="TConfigurationFile"/>
+      </xs:choice>
+    </xs:sequence>
+    <xs:attribute name="displayName" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>The name to display for visible templates.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="systemName" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>A default name for the virtual controller.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attributeGroup ref="visible"/>
+    <xs:attributeGroup ref="rwConditions"/>
+    <xs:attribute name="internal" type="xs:boolean" use="optional">
+      <xs:annotation>
+        <xs:documentation>Internal use</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TCombination">
+    <xs:annotation>
+      <xs:documentation>An allowed combination of two or more mechanisms in a task.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Mechanism" minOccurs="2" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+            Specifies a mechanism model or family. A mechanism is matched if its ModelName starts with the value of the model attribute.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:attribute name="model" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>
+                Specifies a mechanism model or family. A mechanism is matched if its ModelName starts with the value.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:element name="ControllerTemplates">
+    <xs:annotation>
+      <xs:documentation>
+        Contains templates that specify RobotWare features required build a virtual controller for a robot or other mechanism model.
+        Templates are used for creating a controller from layout, creating a solution with a controller or adding a new controller to a station.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="BaseTemplates" minOccurs="0" maxOccurs="1">
+          <xs:annotation>
+            <xs:documentation>Base templates to be used in other templates.</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="BaseTemplate" minOccurs="0" maxOccurs="unbounded" type="TBaseTemplate"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Group" minOccurs="1" maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:documentation>A group of templates.</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="Template" type="TTemplate"/>
+            </xs:sequence>
+            <xs:attribute name="displayName" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>Currently not used.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attributeGroup ref="visible"/>
+            <xs:attributeGroup ref="rwConditions"/>
+            <xs:attribute name="type" type="TGroupType" use="required"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="AllowedCombinations" minOccurs="0" maxOccurs="1">
+          <xs:annotation>
+            <xs:documentation>
+              Specifies combinations of mechanisms that are allowed in a single task. This is used for validation when creating a controller from layout.
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Combination" type="TCombination" minOccurs="0" maxOccurs="unbounded">
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attributeGroup ref="rwConditions"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

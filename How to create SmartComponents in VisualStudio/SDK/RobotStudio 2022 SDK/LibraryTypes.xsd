@@ -1,0 +1,322 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="LibraryTypes"
+    targetNamespace="urn:abb-robotics-robotstudio-librarytypes"
+    elementFormDefault="qualified"
+    xmlns="urn:abb-robotics-robotstudio-librarytypes"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <!-- Simple types -->
+
+  <xs:simpleType name="TKnownGalleryLocation">
+    <!-- NOTE: Same names as in KnownGalleryLocation class -->
+    <xs:annotation>
+      <xs:documentation>Specifies they type of content which is used to determine where it is presented.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Robots">
+        <xs:annotation>
+          <xs:documentation>The content is ABB robot models</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="RobotEquipment">
+        <xs:annotation>
+          <xs:documentation>The content is robot-close ABB equipment such as tracks and positioners</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="OtherEquipment">
+        <xs:annotation>
+          <xs:documentation>The content is other equipment</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <!--
+      <xs:enumeration value="Tools">
+        <xs:annotation>
+          <xs:documentation>The content is tools</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      -->
+      <xs:enumeration value="SmartComponents">
+        <xs:annotation>
+          <xs:documentation>The content is smart components</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TGalleryLocation">
+    <xs:annotation>
+      <xs:documentation>A string that is either a known constant, or the ID of a menu or gallery.</xs:documentation>
+    </xs:annotation>
+    <xs:union memberTypes="TKnownGalleryLocation xs:string"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="TKnownGroupId">
+    <xs:annotation>
+      <xs:documentation>Built-in group identifiers</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="articulated"/>
+      <xs:enumeration value="collaborative"/>
+      <xs:enumeration value="parallel"/>
+      <xs:enumeration value="scara"/>
+      <xs:enumeration value="paintrobots"/>
+      <xs:enumeration value="positioners"/>
+      <xs:enumeration value="tracks"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TGroupId">
+    <xs:annotation>
+      <xs:documentation>Specifies the identifier of a new or existing group.</xs:documentation>
+    </xs:annotation>
+    <xs:union memberTypes="TKnownGroupId xs:string"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="TAttributeItems">
+    <xs:annotation>
+      <xs:documentation>A group of allowed attribute values, separated by semicolon.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="TAttributeQuantity">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="length">
+        <xs:annotation>
+          <xs:documentation>The attribute is displayed as a numeric control for specifying a length.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  
+  <!-- Elements -->
+  
+  <xs:complexType name="TAttributeItem">
+    <xs:annotation>
+      <xs:documentation>An attribute value with a separate display value.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="value" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>Actual value of the attribute</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="caption" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>Display value of the attribute</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  
+  <xs:complexType name="TAttributeDef">
+    <xs:annotation>
+      <xs:documentation>A selectable attribute that is displayed as a combo box in the attribute selection UI.
+      The allowed attribute values can be specified explicitly, otherwise they are inferred from the variant elements.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence minOccurs="0">
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ItemGroup">
+        <xs:annotation>
+          <xs:documentation>A group of allowed attribute values that is activated when a condition (using other attributes) evaluates to true.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence minOccurs="0">
+            <xs:element maxOccurs="unbounded" name="Item" type="TAttributeItem">
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="condition" type="xs:string" use="required">
+            <xs:annotation>
+              <xs:documentation>
+                Condition for activating the value group.
+                The condition should contain at least one other attribute value inside curly brackets, for example "{side}==A_RIGHT".
+              </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="items" type="TAttributeItems" use="optional" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Item" type="TAttributeItem"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>The name of the attribute. It must match the attributes in the variant elements.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="caption" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>A text to display in front of the combo box.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="items" type="TAttributeItems" use="optional">
+    </xs:attribute>
+    <xs:attribute name="type" type="TAttributeQuantity" use="optional">
+      <xs:annotation>
+        <xs:documentation>Specifies that the attribute is displayed as a numeric control with the specified quantity instead of a combo box.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="min" type="xs:decimal" use="optional">
+      <xs:annotation>
+        <xs:documentation>Minimum value of the attribute if "type" is specified.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="max" type="xs:decimal" use="optional">
+      <xs:annotation>
+        <xs:documentation>Maximum value of the attribute if "type" is specified.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TLibrary">
+    <xs:annotation>
+      <xs:documentation>Adds one or more components (.rslib) to the gallery based on a wildcard. Each matching file is displayed as a separate entry.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="include" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>Relative path and name of the files. Can contain wildcards in the filename.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="exclude" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>One or more items matched by the "include" wildcard that should not be included. Separated by semicolon and can contain wildcards.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="description" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Additional description to display in the gallery.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  
+  <xs:complexType name="TLibraryType">
+    <xs:annotation>
+      <xs:documentation>
+        A component with several variants that appear as a single entry in the gallery.
+        When the entry is selected, a configuration dialog appears that allows the user to select a variant based on one or more attributes.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="HelpText" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="1" name="RobotTypes" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Only used for tracks. Specifies which robot types that can be carried by the track.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Attribute" minOccurs="0" maxOccurs="unbounded" type="TAttributeDef"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Static">
+        <xs:annotation>
+          <xs:documentation>A static text that displays the value of an attribute for the currently selected variant.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:attribute name="name" type="xs:string" use="required">
+            <xs:annotation>
+              <xs:documentation>The name of the attribute of which to display the value</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="caption" type="xs:string" use="required">
+            <xs:annotation>
+              <xs:documentation>A text to display in front of the value</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+      <xs:element maxOccurs="unbounded" name="Variant">
+        <xs:annotation>
+          <xs:documentation>
+            One or more component (.rslib) files selected by attribute values. Multiple files are separated by semicolon.
+            The variant is selected if the values of the xml attributes match the values that the user has selected in the UI.
+            The text content should contain the relative path and filename of the file(s). It can contain wildcards, in which case the "latest" (using natural sort) is selected.
+            Alternatively, if attribute values are explicitly defined, the filename can contain values like "IRBT2005_{variant}.rslib".
+          </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="xs:string">
+              <xs:attribute name="attach" use="optional" type="xs:boolean">
+                <xs:annotation>
+                  <xs:documentation>If two files are specified, attach the first component to the second.</xs:documentation>
+                </xs:annotation>
+              </xs:attribute>
+              <xs:anyAttribute processContents="skip"/>
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="caption" type="xs:string" use="required" >
+      <xs:annotation>
+        <xs:documentation>Name to display in the gallery.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="preview" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>Path to an .rslib or .png file to display as an image in the gallery. Can contain wildcards.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="id" type="xs:string" use="optional" />
+  </xs:complexType>
+  
+  <xs:complexType name="TGroup">
+    <xs:annotation>
+      <xs:documentation>A group of components with a header in the gallery.</xs:documentation>
+    </xs:annotation>
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="LibraryType" type="TLibraryType"/>
+      <xs:element name="Library" type="TLibrary"/>
+      <xs:element name="RowBreak">
+        <xs:annotation>
+          <xs:documentation>Adds a row break in the gallery.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType/>
+      </xs:element>
+    </xs:choice>
+    <xs:attribute name="caption" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>The header text of a new group.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="id" type="TGroupId" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies an id of a new or existing group.
+          If caption is empty, the components are added to the existing group with the same id.
+          If caption is not empty, sets the id of the group.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TPopup">
+    <xs:annotation>
+      <xs:documentation>A popup with components.</xs:documentation>
+    </xs:annotation>
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="LibraryType" type="TLibraryType"/>
+      <xs:element name="Library" type="TLibrary"/>
+    </xs:choice>
+    <xs:attribute name="caption" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>The popup text</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <!-- Root element -->
+  
+  <xs:element name="LibraryTypes">
+    <xs:annotation>
+      <xs:documentation>
+        Specifies how library components are organized and presented in the RobotStudio menu system.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="Group" maxOccurs="unbounded" type="TGroup"/>
+        <xs:element name="Popup" maxOccurs="unbounded" type="TPopup"/>
+      </xs:choice>
+      <xs:attribute name="location" type="TGalleryLocation" use="optional">
+        <xs:annotation>
+          <xs:documentation>Specifies where the content should be placed in the menu system.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

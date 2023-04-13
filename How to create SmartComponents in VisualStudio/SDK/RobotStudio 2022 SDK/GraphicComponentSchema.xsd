@@ -1,0 +1,1723 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="GraphicComponent"
+    targetNamespace="urn:abb-robotics-robotstudio-graphiccomponent"
+    elementFormDefault="qualified"
+    xmlns="urn:abb-robotics-robotstudio-graphiccomponent"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+
+
+  <!-- Base types -->
+
+  <xs:simpleType name="TNumber">
+    <xs:annotation>
+      <xs:documentation>A numeric literal, {variable} or a mathematical expression.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <!-- Matches a literal, {replacement} or expression -->
+      <xs:pattern value="([-+]?\d*\.?\d+|\{\w+\}|(\[\[)?[\s\w\.\+\-\*\\(\)\{\}\^/]+)(\]\])?"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TCondition">
+    <xs:annotation>
+      <xs:documentation>
+        A boolean expression that support {variables}, operators like ==,!=,&lt;=,&amp;&amp;,|| and parantheses.
+        If the expression evaluates to false, the entire element is ignored.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <!--xs:pattern value="([^=&lt;&gt;!]+)(==|&lt;|&gt;|!=|&lt;=|&gt;=)([^=&lt;&gt;!]+)"/-->
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TVector3">
+    <xs:annotation>
+      <xs:documentation>Three numbers separated by commas representing a vector or a point. Can contain literals, {variables} and mathematical expressions.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[^,]+,[^,]+,[^,]+|\{\w+\}"></xs:pattern>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TQuaternion">
+    <xs:annotation>
+      <xs:documentation>Four numbers separated by commas representing a quaternion.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[^,]+,[^,]+,[^,]+,[^,]+|\{\w+\}"></xs:pattern>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TDoubleVector">
+    <xs:annotation>
+      <xs:documentation>Numbers separated by comma.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[^,]+(,[^,]+)*"></xs:pattern>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:attributeGroup name="Matrix4">
+    <xs:attribute name="x" type="TVector3" use="optional"/>
+    <xs:attribute name="y" type="TVector3" use="optional"/>
+    <xs:attribute name="z" type="TVector3" use="optional"/>
+    <xs:attribute name="t" type="TVector3" use="optional">
+      <xs:annotation>
+        <xs:documentation>Position of the object.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="euler" type="TVector3" use="optional">
+      <xs:annotation>
+        <xs:documentation>Orientation of the object, expressed as Euler angles (zyx order).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="quat" type="TQuaternion" use="optional">
+      <xs:annotation>
+        <xs:documentation>Orientation of the object, expressed as a quaternion.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+
+  <xs:simpleType name="TLengthUnit">
+    <xs:annotation>
+      <xs:documentation>Specifies the unit used in the xml for length values. The default is API units (meters).</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="m"/>
+      <xs:enumeration value="mm"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TAngleUnit">
+    <xs:annotation>
+      <xs:documentation>Specifies the unit used in the xml for angle values. The default is API units (radians).</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="deg"/>
+      <xs:enumeration value="rad"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TColor">
+    <xs:annotation>
+      <xs:documentation>Specifies a color as r,g,b[,a] where each value is in the range 0-255.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\d+\s*,\s*\d+\s*,\s*\d+\s*(,\s*\d+)?"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TName">
+    <xs:annotation>
+      <xs:documentation>Name of the object. Should typically be unique within the context of the owner.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="TKinematicsFlags">
+    <xs:annotation>
+      <xs:documentation>Specifies the kinematics type and additional properties for a robot Mechanism.</xs:documentation>
+    </xs:annotation>
+    <!-- Same as KinematicsFlags in API -->
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Articulated">
+        <xs:annotation>
+          <xs:documentation>Articulated kinematics with six active joints or more</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Palletizer">
+        <xs:annotation>
+          <xs:documentation>Palletizer kinematics with four active joints</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Picker">
+        <xs:annotation>
+          <xs:documentation>Picker (delta) kinematics</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Scara">
+        <xs:annotation>
+          <xs:documentation>SCARA kinematics (also door opener)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Other">
+        <xs:annotation>
+          <xs:documentation>Other type of kinematics (not recognized/handled by RobotStudio)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ParallelRod">
+        <xs:annotation>
+          <xs:documentation>Robot has a parallel rod and cannot "bend backwards"</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Gantry">
+        <xs:annotation>
+          <xs:documentation>Robot first axis is a gantry</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="HollowWrist">
+        <xs:annotation>
+          <xs:documentation>Paint robot with hollow wrist</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+  <!-- SmartComponent types -->
+
+  <xs:simpleType name="TKnownPropertyType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="System.Double"/>
+      <xs:enumeration value="System.Int32"/>
+      <xs:enumeration value="System.String"/>
+      <xs:enumeration value="System.Boolean"/>
+      <xs:enumeration value="System.Drawing.Color"/>
+      <xs:enumeration value="ABB.Robotics.Math.Vector3"/>
+      <xs:enumeration value="ABB.Robotics.Math.Matrix4"/>
+      <xs:enumeration value="ABB.Robotics.RobotStudio.ProjectObject"/>
+      <xs:enumeration value="ABB.Robotics.RobotStudio.Stations.GraphicComponent"/>
+      <xs:enumeration value="ABB.Robotics.RobotStudio.Stations.SmartComponent"/>
+      <xs:enumeration value="ABB.Robotics.RobotStudio.Stations.Mechanism"/>
+      <xs:enumeration value="ABB.Robotics.RobotStudio.Stations.Part"/>
+      <xs:enumeration value="ABB.Robotics.RobotStudio.Stations.Body"/>
+      <xs:enumeration value="ABB.Robotics.RobotStudio.Stations.Face"/>
+      <xs:enumeration value="ABB.Robotics.RobotStudio.Stations.Wire"/>
+      <xs:enumeration value="ABB.Robotics.RobotStudio.Stations.IHasTransform"/>
+      <xs:enumeration value="ABB.Robotics.RobotStudio.Stations.IAttachableChild"/>
+      <xs:enumeration value="ABB.Robotics.RobotStudio.Stations.IAttachableParent"/>
+      <xs:enumeration value="ABB.Robotics.RobotStudio.Stations.IHasGraphicComponents"/>
+      <xs:enumeration value="ABB.Robotics.RobotStudio.Stations.Camera"/>
+      <xs:enumeration value="ABB.Robotics.RobotStudio.Stations.Asset"/>
+      <xs:enumeration value="ABB.Robotics.RobotStudio.Stations.Light"/>
+      <xs:enumeration value="ABB.Robotics.RobotStudio.Stations.Markup"/>
+      <xs:enumeration value="ABB.Robotics.RobotStudio.Stations.RsIrc5Controller"/>
+      <xs:enumeration value="ABB.Robotics.RobotStudio.Stations.PhysicsConstraint"/>
+      <!-- TODO: the rest. See also DynamicProperty.GetValidTypes() -->
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TPropertyType">
+    <xs:annotation>
+      <xs:documentation>Specifies the .NET type for the value of a DynamicProperty.</xs:documentation>
+    </xs:annotation>
+    <xs:union memberTypes="TKnownPropertyType xs:string"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="TKnownSignalName">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="SensorOut">
+        <xs:annotation>
+          <xs:documentation>Used for outputs from sensor components.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Active">
+        <xs:annotation>
+          <xs:documentation>Used to activate a component.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Execute">
+        <xs:annotation>
+          <xs:documentation>Used to execute an action.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Executed">
+        <xs:annotation>
+          <xs:documentation>Used to indicate when an action has been executed.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TSignalName">
+    <xs:annotation>
+      <xs:documentation>Name of the signal. Must be unique in the owner's context.</xs:documentation>
+    </xs:annotation>
+    <xs:union memberTypes="TKnownSignalName xs:string"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="TSignalType">
+    <xs:annotation>
+      <xs:documentation>Specifies data type and direction of an IOSignal.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="DigitalInput"/>
+      <xs:enumeration value="DigitalOutput"/>
+      <xs:enumeration value="DigitalGroupInput"/>
+      <xs:enumeration value="DigitalGroupOutput"/>
+      <xs:enumeration value="AnalogInput"/>
+      <xs:enumeration value="AnalogOutput"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TIOSignalFlags">
+    <xs:annotation>
+      <xs:documentation>Specifies additional properties for an IOSignal.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ShowCommand">
+        <xs:annotation>
+          <xs:documentation>Indicates if a digital input signal should be displayed as a button in the context menu of the parent component.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TMotionControlType">
+    <xs:annotation>
+      <xs:documentation>Specifies physics behavior for a component.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None">
+        <xs:annotation>
+          <xs:documentation>The object does not take part in the physics simulation.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Static">
+        <xs:annotation>
+          <xs:documentation>The object interacts with other objects in the physics simulation, but its position is fixed.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Kinematic">
+        <xs:annotation>
+          <xs:documentation>The object interacts with other objects in the physics simulation, but its motion is not affected.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Dynamic">
+        <xs:annotation>
+          <xs:documentation>The motion of the object is controlled by the physics simulation.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TKnownAttributeKey">
+    <xs:restriction base="xs:string">
+      <!--xs:enumeration value="Protected">
+				<xs:annotation>
+					<xs:documentation>Indicates that the property should not be possible to delete or modify.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration-->
+      <xs:enumeration value="MinValue">
+        <xs:annotation>
+          <xs:documentation>Indicates the minium value for a numeric property. Value must be a number.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MaxValue">
+        <xs:annotation>
+          <xs:documentation>Indicates the maximum value for a numeric property. Value must be a number.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AllowedValues">
+        <xs:annotation>
+          <xs:documentation>Indicates the allowed values for a numeric or string property.</xs:documentation>
+          <xs:documentation>Value must be a list delimited by semicolons</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MinLength">
+        <xs:annotation>
+          <xs:documentation>Indicates the minimum length of a string property. Value must be an integer.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MaxLength">
+        <xs:annotation>
+          <xs:documentation>Indicates the maximum length of a string property. Value must be an integer.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AllowedCharacters">
+        <xs:annotation>
+          <xs:documentation>Indicates the allowed characters in a string property.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ValueFilter">
+        <xs:annotation>
+          <xs:documentation>Specifies a regular expression used to verify the property value (converted to a string).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Quantity">
+        <xs:annotation>
+          <xs:documentation>Indicates the quantity that a numeric property represents.</xs:documentation>
+          <xs:documentation>Value must be a member of the BuiltinQuantity enumeration.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AutoApply">
+        <xs:annotation>
+          <xs:documentation>Indicates that the property value should be applied immediately when it is changed</xs:documentation>
+          <xs:documentation>in the GUI, rather than when the user clicks "Apply" or equivalent.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Slider">
+        <xs:annotation>
+          <xs:documentation>Indicates that a numeric property should be displayed as a slider.</xs:documentation>
+          <xs:documentation>Requires that MinValue and MaxValue are also set.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CustomValidation">
+        <xs:annotation>
+          <xs:documentation>Indicates that QueryPropertyValueValid() should be called to validate the value.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AllowedTypes">
+        <xs:annotation>
+          <xs:documentation>Allows additional type checking. Value must be full names of allowed types</xs:documentation>
+          <xs:documentation>delimited by semicolons.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AllowParent">
+        <xs:annotation>
+          <xs:documentation>Indicates that the component that owns the property is a valid value (by default it is not).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AddToDisplayName">
+        <xs:annotation>
+          <xs:documentation>Indicates that the value of the property should be added to the DisplayName of the parent component.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="DisplayValues">
+        <xs:annotation>
+          <xs:documentation>Indicates alternative display values for a property. Value must be a list delimited by</xs:documentation>
+          <xs:documentation>semicolons with the same number of elements as the AllowedValues attribute.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="VectorUsage">
+        <xs:annotation>
+          <xs:documentation>Indicates the usage of a Vector3 property. Valid values are Position and Direction.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Reference">
+        <xs:annotation>
+          <xs:documentation>Indicates the reference coordinate system of a Vector3 or Matrix4 property. Valid values are Global and Local.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Multiline">
+        <xs:annotation>
+          <xs:documentation>Indicates that a string property can have multiple lines.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TAttributeKey">
+    <xs:annotation>
+      <xs:documentation>Attribute key.</xs:documentation>
+    </xs:annotation>
+    <xs:union memberTypes="TKnownAttributeKey xs:string"/>
+  </xs:simpleType>
+
+  <xs:complexType name="TObjectAttribute">
+    <xs:annotation>
+      <xs:documentation>Adds a key-value pair to the Attributes collection of an object.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="condition" type="TCondition" use="optional"/>
+    <xs:attribute name="key" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>Attribute key.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="value" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>Attribute value.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="definition" type="xs:boolean" use="optional">
+      <xs:annotation>
+        <xs:documentation>Adds the attribute to the definition of a GraphicComponent, instead of the instance.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TObjectAttributeCollection">
+    <xs:annotation>
+      <xs:documentation>Adds entries to the Attributes collection of an object.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Attribute" type="TObjectAttribute" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="TPropertyAttribute">
+    <xs:annotation>
+      <xs:documentation>A key-value pair that specifies additional information about a property.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="key" type="TAttributeKey" use="required"/>
+    <xs:attribute name="value" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Value of the attribute. Specify the value '?' to indicate that the actual value should be dynamically retrieved from Code Behind.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TDynamicProperty">
+    <xs:annotation>
+      <xs:documentation>Defines a DynamicProperty on a SmartComponent.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Attribute" type="TPropertyAttribute" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="TName" use="required"/>
+    <xs:attribute name="valueType" type="TPropertyType" use="required"/>
+    <xs:attribute name="value" use="optional">
+      <xs:annotation>
+        <xs:documentation>Specifies an initial value for the property.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="uiVisible" type="xs:boolean" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicates if the property should be visible in the user interface.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="readOnly" type="xs:boolean" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicates if the property value should be read-only in the user interface.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="caption" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Specifies a display name for the property. This can also be set in the resource xml.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="description" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Specifies a description for the property. This can also be set in the resource xml.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="group" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Specifies a group name for the property. This can also be set in the resource xml.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TDynamicPropertyCollection">
+    <xs:annotation>
+      <xs:documentation>Adds DynamicProperty objects to a SmartComponent.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="DynamicProperty" type="TDynamicProperty" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+
+  </xs:complexType>
+
+  <xs:complexType name="TAsset">
+    <xs:annotation>
+      <xs:documentation>Adds the contents of a file as an Asset to a SmartComponent.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="name" type="TName"/>
+    <xs:attribute name="source" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Path and file name of the file, relative to this file.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="allowSave" type="xs:boolean" default="true">
+      <xs:annotation>
+        <xs:documentation>Indicates if the user is allowed to save the asset to a file.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TAssetCollection">
+    <xs:annotation>
+      <xs:documentation>Adds the content of files as Asset objects to a SmartComponent.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Asset" type="TAsset" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="TIOSignal">
+    <xs:annotation>
+      <xs:documentation>Defines an IOSignal on a SmartComponent or a Station.</xs:documentation>
+    </xs:annotation>
+    <!-- xs:sequence>
+      <xs:element name="Attribute" type="TPropertyAttribute" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence -->
+    <xs:attribute name="name" type="TSignalName" use="required"/>
+    <xs:attribute name="signalType" type="TSignalType" use="required"/>
+    <xs:attribute name="value" use="optional">
+      <xs:annotation>
+        <xs:documentation>Specifies an initial value for the signal.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="uiVisible" type="xs:boolean" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Indicates if the signal should be visible in the user interface.
+          If not defined, this defaults to false for auto-reset output signals.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="readOnly" type="xs:boolean" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Indicates if the signal value should be read-only in the user interface.
+          If not defined, this defaults to true on output signals.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="autoReset" type="xs:boolean" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicates if a digital signal should automatically be reset to 0.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="minValue" type="xs:double" use="optional">
+      <xs:annotation>
+        <xs:documentation>Specifies the minimum value for an analog signal.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="maxValue" type="xs:double" use="optional">
+      <xs:annotation>
+        <xs:documentation>Specifies the maximum value for an analog signal.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="flags" use="optional">
+      <xs:annotation>
+        <xs:documentation>Specifies additional attributes for the signal.</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:list itemType="TIOSignalFlags"/>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="caption" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Specifies a display name for the signal. This can also be set in the resource xml.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="description" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Specifies a description for the signal. This can also be set in the resource xml.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="group" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>Specifies a group name for the signal. This can also be set in the resource xml.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TIOSignalCollection">
+    <xs:annotation>
+      <xs:documentation>Adds IOSignal objects to a SmartComponent.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="IOSignal" type="TIOSignal" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="TPropertyBinding">
+    <xs:annotation>
+      <xs:documentation>
+        Defines a binding from a DynamicProperty to a different property or signal.
+        The value can be converted but the source and target types must be compatible.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="source" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Source property, identified by name (if owned by the samed object as the binding) or object-name.name (if owned by a different object).
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="target" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Target property or signal, identified by name (if owned by the samed object as the binding) or object-name.name (if owned by a different object).
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="allowCycle" type="xs:boolean" use="optional">
+      <xs:annotation>
+        <xs:documentation>True to allow this binding to form a cycle, which is normally prohibited.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <!-- Special case to reduce the amount of typing -->
+  <xs:complexType name="TExpressionBinding">
+    <xs:annotation>
+      <xs:documentation>
+        Defines a binding from one or more DynamicProperty objects to a property or signal, using a mathematical expression to calculate the value.
+        This will add an Expression SmartComponent and associated bindings to the component.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="sources" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Source properties separated by semicolon and identified by name (if owned by the samed object as the binding) or object-name.name (if owned by a different object)
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="expression" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Mathematical expression using literals and properties as specified in the 'sources' attribute.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="target" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Target property or signal, identified by name (if owned by the samed object as the binding) or object-name.name (if owned by a different object).
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TBindingCollection">
+    <xs:annotation>
+      <xs:documentation>Defines property bindings in a SmartComponent or Station.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="PropertyBinding" type="TPropertyBinding"/>
+        <xs:element name="ExpressionBinding" type="TExpressionBinding"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="TIOConnection">
+    <xs:annotation>
+      <xs:documentation>
+        Defines a binding from an IOSignal to a different signal or property.
+        The value can be converted but the source and target types must be compatible.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="source" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Source signal, identified by name (if owned by the samed object as the binding) or object-name.name (if owned by a different object).
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="target" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Target signal or property, identified by name (if owned by the samed object as the binding) or object-name.name (if owned by a different object).
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="allowCycle" type="xs:boolean" use="optional">
+      <xs:annotation>
+        <xs:documentation>True to allow this connection to form a cycle, which is normally prohibited.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TConnectionCollection">
+    <xs:annotation>
+      <xs:documentation>Defines IO connections on a SmartComponent or Station.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="IOConnection" type="TIOConnection" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="TPropertyValue">
+    <xs:annotation>
+      <xs:documentation>Specifies the initial value for a DynamicProperty in the embedded component.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="name" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Name of the DynamicProperty.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="value" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Value to set on the DynamicProperty when the embedded component is loaded.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TSignalValue">
+    <xs:annotation>
+      <xs:documentation>Specifies the initial value for an IOSignal in the embedded component.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="name" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Name of the IOSignal.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="value" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Value to set on the IOSignal when the embedded component is loaded.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <!-- Mechanism types -->
+
+  <xs:simpleType name="TMechanismType">
+    <xs:annotation>
+      <xs:documentation>Defines the type of mechanism.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Undefined"/>
+      <xs:enumeration value="Tool">
+        <xs:annotation>
+          <xs:documentation>A tool mechanism.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Robot">
+        <xs:annotation>
+          <xs:documentation>A robot.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ExternalAxis">
+        <xs:annotation>
+          <xs:documentation>An external axis such as a track or positioner.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Irc5Conveyor">
+        <xs:annotation>
+          <xs:documentation>A conveyor mechanism.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Other"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TJointType">
+    <xs:annotation>
+      <xs:documentation>Defines the type of a mechanism joint.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Rotational">
+        <xs:annotation>
+          <xs:documentation>Rotational joint.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Prismatic">
+        <xs:annotation>
+          <xs:documentation>Prismatic (linear) joint.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <!--xs:enumeration value="Undefined"/-->
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="TJoint">
+    <xs:annotation>
+      <xs:documentation>Defines a joint that connects two links in a kinematic chain.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="name" type="TName"/>
+    <xs:attribute name="parent" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>The name of the parent link in the chain.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="child" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>The name of the child link in the chain.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="type" type="TJointType"/>
+    <xs:attribute name="active" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>Specifies if the joint is actively controlled (true) or follows other joints (false).</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="point1" type="TVector3">
+      <xs:annotation>
+        <xs:documentation>
+          First point on the joint axis.
+          For a rotational joint the axis is the rotation axis, for a prismatic joint it is any vector in the direction of movement.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="point2" type="TVector3">
+      <xs:annotation>
+        <xs:documentation>
+          Second point on the joint axis.
+          For a rotational joint the axis is the rotation axis, for a prismatic joint it is any vector in the direction of movement.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="modelOffset" type="xs:double" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Offset between the joint value in the model and in the controller, see Mechanism.SetJointModelOffset().
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TFourBarJoint">
+    <xs:annotation>
+      <xs:documentation>Defines a four-bar linkage.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Crank" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            Defines the active (‘crank’) link which is controlled by the joint value.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:attribute name="link" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>The name of the Link that acts as crank.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="point1" type="TVector3">
+            <xs:annotation>
+              <xs:documentation>Position of joint between frame and crank.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="point2" type="TVector3">
+            <xs:annotation>
+              <xs:documentation>Position of joint between crank and coupler.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Lever" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+            The passive (‘lever’) link.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:attribute name="link" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>The name of the Link that acts as lever.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="point1" type="TVector3">
+            <xs:annotation>
+              <xs:documentation>Position of joint between frame and lever.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="point2" type="TVector3">
+            <xs:annotation>
+              <xs:documentation>Position of joint between lever and coupler.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="name" type="TName"/>
+    <xs:attribute name="parent" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>The name of the Link that acts as parent ('frame').</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="child" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>The name of the Link that acts as child ('coupler').</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="axis" type="TVector3">
+      <xs:annotation>
+        <xs:documentation>The axis around which all the linkage joints rotate.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TLimit">
+    <xs:annotation>
+      <xs:documentation>Defines the upper and lower limits for a Joint.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Polynomial" type="TPolynomial" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="joint" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Name of the Joint</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="min" type="TNumber">
+      <xs:annotation>
+        <xs:documentation>Fixed lower joint limit.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="max" type="TNumber">
+      <xs:annotation>
+        <xs:documentation>Fixed upper joint limit.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="points" type="TDoubleVector" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Variable joint limits expressed as an area on a graph defined by points.
+          For more information see "Create Mechanism" in RobotStudio help.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="condition" type="TCondition" use="optional"/>
+  </xs:complexType>
+
+  <xs:complexType name="TPolynomial">
+    <xs:annotation>
+      <xs:documentation>Defines joint limits as mathematical expressions using values of other joints.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="min" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Lower joint limit as a mathematical expression where names of other joints represent their values.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="max" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Upper joint limit as a mathematical expression where names of other joints represent their values.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="angleUnit" type="TAngleUnit" use="optional">
+      <xs:annotation>
+        <xs:documentation>Angle unit used in the expression (for both input and output), if other than specified on the GraphicComponent level.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TConstantDependency">
+    <xs:annotation>
+      <xs:documentation>Defines the value of a dependant (passive) joint as a factor multiplied with the value of one other joint.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="joint" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Name of the dependant (passive) Joint</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="leadJoint" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Name of the 'lead' Joint that the joint depends on.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="factor" type="TNumber">
+      <xs:annotation>
+        <xs:documentation>Factor to multiply the lead joint value with.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TVariableDependency">
+    <xs:annotation>
+      <xs:documentation>Defines the value of a dependant (passive) joint as a mathematical expression using the values of one or more other joints.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="joint" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Name of the dependant (passive) Joint</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="expression" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Joint value as a mathematical expression where names of other joints represent their values.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TLoadData">
+    <xs:annotation>
+      <xs:documentation>Defines load data for a mechanism of type Tool, cf. RAPID loaddata.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="mass" type="TNumber" use="required">
+      <xs:annotation>
+        <xs:documentation>Mass of the load.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="centerOfGravity" type="TVector3">
+      <xs:annotation>
+        <xs:documentation>Center of gravity of the payload expressed in in the tool coordinate system.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="axesOfMoment" type="TQuaternion">
+      <xs:annotation>
+        <xs:documentation>Orientation of the axes of moment.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="inertia" type="TVector3">
+      <xs:annotation>
+        <xs:documentation>The moment of inertia of the load around the x-axis of moment.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TToolData">
+    <xs:annotation>
+      <xs:documentation>Defines a tool center point (ToolDataInfo) for a mechanism of type Tool.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="name" type="TName" use="required"/>
+    <xs:attribute name="link" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>Name of the link component that moves the tool.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attributeGroup ref="Matrix4"/>
+  </xs:complexType>
+
+  <xs:complexType name="TFlange">
+    <xs:annotation>
+      <xs:documentation>Defines a flange that works as a mounting point on a mechanism. For a robot this equals tool0.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="name" type="TName"/>
+    <xs:attribute name="link" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>Name of the link component that moves the flange.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="condition" type="TCondition"/>
+    <xs:attributeGroup ref="Matrix4"/>
+    <!--local???-->
+  </xs:complexType>
+
+  <xs:simpleType name="TFrameType">
+    <xs:annotation>
+      <xs:documentation>Defines the intended usage of a Frame.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Generic">
+        <xs:annotation>
+          <xs:documentation>A generic modelling frame. </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AttachmentPoint">
+        <xs:annotation>
+          <xs:documentation>A point where another object can be attached. </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MountingPoint">
+        <xs:annotation>
+          <xs:documentation>A point where the object can be attached to another object. </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="TFrame">
+    <xs:annotation>
+      <xs:documentation>Adds a Frame to a component.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="name" type="TName" use="optional"/>
+    <xs:attribute name="type" type="TFrameType" use="required"/>
+    <!--xs:attribute name="uiVisible" type="xs:boolean"/-->
+    <xs:attributeGroup ref="Matrix4"/>
+    <xs:attribute name="condition" type="TCondition" use="optional"/>
+    <xs:attribute name="visible" type="xs:boolean" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicates if the frame should be visible in the 3D graphics.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TFrameCollection">
+    <xs:annotation>
+      <xs:documentation>Adds one or more Frame objects to a component.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Frame" type="TFrame" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Misc types -->
+
+  <xs:complexType name="TReplaceColorCollection">
+    <xs:annotation>
+      <xs:documentation>Specifies that colors in the source geometry should be replaced with other colors in the final component.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="ReplaceColor">
+        <xs:annotation>
+          <xs:documentation>Specifies a color to replace.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:attribute name="old" type="TColor" use="optional">
+            <xs:annotation>
+              <xs:documentation>Specifies the color to replace. If omitted, the entire component is set to the new color.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="new" type="TColor" use="required">
+            <xs:annotation>
+              <xs:documentation>Specifies the new color.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="TMask">
+    <xs:annotation>
+      <xs:documentation>Ones and zeroes separated by comma.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([01],\s?)*[01]"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="TCableControlPoint">
+    <xs:annotation>
+      <xs:documentation>Defines a point through which a physics cable is routed when it is created.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="position" type="TVector3" use="required">
+      <xs:annotation>
+        <xs:documentation>The position of the point, in global coordinates.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="direction" type="TVector3" use="optional">
+      <xs:annotation>
+        <xs:documentation>The direction of the cable at the point. If omitted the cable rotates freely.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="attachedTo" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          The name of a graphic component that the cable will be attached to at the point.
+          If omitted, the cable will move freely after it is created.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <!-- GraphicComponent base types -->
+
+  <xs:complexType name="TGraphicComponent" abstract="true">
+    <xs:attribute name="lengthUnit" type="TLengthUnit" use="optional"/>
+    <xs:attribute name="angleUnit" type="TAngleUnit" use="optional"/>
+    <xs:attribute name="name" type="TName" use="optional"/>
+    <xs:attribute name="uiVisible" type="xs:boolean" use="optional">
+      <xs:annotation>
+        <xs:documentation>Indicates if the component should be visible in user interface like browsers.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="gfxVisible" type="xs:boolean" use="optional">
+      <xs:annotation>
+        <xs:documentation>Specifies if the component should be visible in the 3D graphics.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="motionControl" type="TMotionControlType" use="optional"/>
+    <!-- TODO: Physics material (here or on Part only?) -->
+    <xs:attribute name="condition" type="TCondition" use="optional"/>
+    <xs:attributeGroup ref="Matrix4"/>
+  </xs:complexType>
+
+  <xs:complexType name="TGraphicComponentCollection">
+    <xs:annotation>
+      <xs:documentation>A collection of one or more objects derived from GraphicComponent.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="Part" type="TPart"/>
+        <xs:element name="GraphicComponentGroup" type="TGraphicComponentGroup"/>
+        <xs:element name="SmartComponent" type="TSmartComponent"/>
+        <xs:element name="Mechanism" type="TMechanism"/>
+        <xs:element name="EmbeddedLibrary" type="TEmbeddedLibrary"/>
+        <xs:element name="Cable" type="TCable"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="TEmbeddedLibrary">
+    <xs:annotation>
+      <xs:documentation>An existing component to be loaded from a library file (.rslib).</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="TGraphicComponent">
+        <xs:sequence>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="PropertyValue" type="TPropertyValue"/>
+            <xs:element name="SignalValue" type="TSignalValue"/>
+          </xs:choice>
+        </xs:sequence>
+        <xs:attribute name="source" type="xs:string" use="required">
+          <xs:annotation>
+            <xs:documentation>Specifies the .rslib file to load the component from.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- Part -->
+
+  <xs:complexType name="TPart">
+    <xs:annotation>
+      <xs:documentation>Defines a Part that can be loaded from file or built with geometric primitives.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="TGraphicComponent">
+        <xs:all>
+          <xs:element name="Bodies" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation>Specifies geometric primitives to make up the Part. Ignored if the source or instanceOf attribute is used.</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="SolidBox">
+                  <xs:annotation>
+                    <xs:documentation>Adds a solid cuboid to the part.</xs:documentation>
+                  </xs:annotation>
+                  <xs:complexType>
+                    <xs:attributeGroup ref="Matrix4"/>
+                    <xs:attribute name="size" type="TVector3" use="required">
+                      <xs:annotation>
+                        <xs:documentation>Size of the cuboid in x, y, z directions.</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="color" type="TColor" use="optional"/>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="SolidSphere">
+                  <xs:annotation>
+                    <xs:documentation>Adds a solid sphere to the part.</xs:documentation>
+                  </xs:annotation>
+                  <xs:complexType>
+                    <xs:attributeGroup ref="Matrix4"/>
+                    <xs:attribute name="radius" type="xs:double" use="required">
+                      <xs:annotation>
+                        <xs:documentation>Radius of the sphere.</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="color" type="TColor" use="optional"/>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="SolidCylinder">
+                  <xs:annotation>
+                    <xs:documentation>Adds a solid cylinder to the part.</xs:documentation>
+                  </xs:annotation>
+                  <xs:complexType>
+                    <xs:attributeGroup ref="Matrix4"/>
+                    <xs:attribute name="radius" type="xs:double" use="required">
+                      <xs:annotation>
+                        <xs:documentation>Radius of the cylinder.</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="height" type="xs:double" use="required">
+                      <xs:annotation>
+                        <xs:documentation>Height of the cylinder.</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="color" type="TColor" use="optional"/>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="SolidCone">
+                  <xs:annotation>
+                    <xs:documentation>Adds a solid cone to the part.</xs:documentation>
+                  </xs:annotation>
+                  <xs:complexType>
+                    <xs:attributeGroup ref="Matrix4"/>
+                    <xs:attribute name="radius" type="xs:double" use="required">
+                      <xs:annotation>
+                        <xs:documentation>Radius of the cone.</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="height" type="xs:double" use="required">
+                      <xs:annotation>
+                        <xs:documentation>Height of the cone.</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="color" type="TColor" use="optional"/>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="SolidPyramid">
+                  <xs:annotation>
+                    <xs:documentation>Adds a solid pyramid to the part.</xs:documentation>
+                  </xs:annotation>
+                  <xs:complexType>
+                    <xs:attributeGroup ref="Matrix4"/>
+                    <xs:attribute name="radius" type="xs:double" use="required">
+                      <xs:annotation>
+                        <xs:documentation>The distance from the center point to the corners of the base of the pyramid.</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="height" type="xs:double" use="required">
+                      <xs:annotation>
+                        <xs:documentation>Height of the pyramid.</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="numSides" type="xs:int" use="required">
+                      <xs:annotation>
+                        <xs:documentation>Number of sides in the pyramid.</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="color" type="TColor" use="optional"/>
+                  </xs:complexType>
+                </xs:element>
+              </xs:choice>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="Frames" type="TFrameCollection" minOccurs="0"/>
+          <xs:element name="ReplaceColors" type="TReplaceColorCollection" minOccurs="0"/>
+        </xs:all>
+        <xs:attribute name="source" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Specifies the file to load the part from. If a file with the same name but .rsgfx extension exists, it takes precedence.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="instanceOf" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Specifies by name a previously defined Part to make a copy of. Ignored if the source attribute is used.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="surfaceModel" type="xs:boolean" use="optional">
+          <xs:annotation>
+            <xs:documentation>Specifies if the part is a surface (non-solid) and both sides should be displayed in the 3D graphics.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="repeat" type="TNumber" use="optional">
+          <xs:annotation>
+            <xs:documentation>Specifies that the part should be repeated (only valid in a GraphicComponentGroup).</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="offset" type="TVector3" use="optional">
+          <xs:annotation>
+            <xs:documentation>Specifies the offset between repeated parts.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="removeGeometry" type="xs:boolean" use="optional">
+          <xs:annotation>
+            <xs:documentation>Specifies if CAD data should be removed after the part has been created, to reduce the file and memory footprint of the component.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- GraphicComponentGroup -->
+
+  <xs:complexType name="TGraphicComponentGroup">
+    <xs:annotation>
+      <xs:documentation>Defines a GraphicComponentGroup that is a grouping of other GraphicComponent objects.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="TGraphicComponent">
+        <xs:all>
+          <xs:element name="Attributes" type="TObjectAttributeCollection" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="GraphicComponents" type="TGraphicComponentCollection" minOccurs="0"/>
+          <xs:element name="Frames" type="TFrameCollection" minOccurs="0"/>
+          <xs:element name="ReplaceColors" type="TReplaceColorCollection" minOccurs="0"/>
+        </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- SmartComponent -->
+
+  <xs:complexType name="TSmartComponent">
+    <xs:annotation>
+      <xs:documentation>Defines a SmartComponent.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="TGraphicComponent">
+        <xs:all>
+          <xs:element name="Properties" type="TDynamicPropertyCollection" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="Bindings" type="TBindingCollection" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="Signals" type="TIOSignalCollection" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="Connections" type="TConnectionCollection" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="Assets" type="TAssetCollection" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="GraphicComponents" type="TGraphicComponentCollection" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="Frames" type="TFrameCollection" minOccurs="0" maxOccurs="1"/>
+        </xs:all>
+        <xs:attribute name="codeBehind" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation><![CDATA[Specifies the fully qualified type name and assembly name of the code behind class for the component in the format <namespace>.<type>,<assembly>.dll]]></xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="canBeSimulated" type="xs:boolean" use="optional">
+          <xs:annotation>
+            <xs:documentation>Specifies if the component should be part of the simulation, e.g. if the code behind receives simulation ticks.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="resources" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>The base name (excluding language specifier) of xml files that contain localized resources for the component.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="icon" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>File name of an image that will be associated with the component.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- Mechanism -->
+
+  <xs:complexType name="TMechanism">
+    <xs:annotation>
+      <xs:documentation>Defines a Mechanism.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="TGraphicComponent">
+        <xs:all minOccurs="0" maxOccurs="1">
+          <xs:element name="Attributes" type="TObjectAttributeCollection" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="Links" minOccurs="1" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Defines the components that constitute the kinematic chain of the mechanism. Each element corresponds to one rigid link.</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:choice minOccurs="1" maxOccurs="unbounded">
+                  <xs:element name="Part" type="TPart"/>
+                  <xs:element name="GraphicComponentGroup" type="TGraphicComponentGroup"/>
+                </xs:choice>
+              </xs:sequence>
+              <xs:attribute name="baseLink" type="xs:string" use="required">
+                <xs:annotation>
+                  <xs:documentation>Name of the component that acts as the first (fixed) link in the kinematic chain.</xs:documentation>
+                </xs:annotation>
+              </xs:attribute>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="Joints" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Defines joints that connect the links in the kinematic chain.</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="Joint" type="TJoint" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="FourBarJoint" type="TFourBarJoint" minOccurs="0" maxOccurs="unbounded"/>
+              </xs:choice>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="Limits" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Defines upper and lower joint limits, fixed or variable.</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="Limit" type="TLimit" minOccurs="0" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="JointMask" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>A mask that defines which joints that are used for the mechanism. See MechanismBuilder.SetJointMask() for details.</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:attribute name="value" type="TMask" use="required"/>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="Dependencies" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Defines dependencies between joints in the kinematic chain.</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                  <xs:element name="ConstantDependency" type="TConstantDependency"/>
+                  <xs:element name="VariableDependency" type="TVariableDependency"/>
+                </xs:choice>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="Flanges" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Defines flanges (mounting points) on the mechanism.</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="Flange" type="TFlange" minOccurs="0" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="ToolDatas" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Defines tool center points on a mechanism of type Tool.</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="ToolData" type="TToolData" minOccurs="0" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="LoadData" type="TLoadData" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="BaseFrame" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Defines the nominal base frame of the mechanism, see Mechanism.ModelBaseFrame.</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:attributeGroup ref="Matrix4"/>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="KinematicBaseFrame" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Defines the kinematic base frame of the mechanism. This can normally be omitted.</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:attributeGroup ref="Matrix4"/>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="CalibrationPosition" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Defines the calibration transforms for the joints of a positioner or track. There should be one CalibrationFrame element for each joint.</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="CalibrationFrame" minOccurs="1" maxOccurs="unbounded">
+                  <xs:annotation>
+                    <xs:documentation>Defines the calibration transform for a joint of a positioner or track.</xs:documentation>
+                  </xs:annotation>
+                  <xs:complexType>
+                    <xs:attributeGroup ref="Matrix4"/>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="HomePosition" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Defines the home (sync) joint values for the mechanism.</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:attribute name="value" type="TDoubleVector" use="required">
+                <xs:annotation>
+                  <xs:documentation>Joint values, one for each active joint.</xs:documentation>
+                </xs:annotation>
+              </xs:attribute>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="CustomKinematics" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Internal use.</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:attribute name="progID" type="xs:string" use="required"/>
+              <xs:attribute name="initValues" type="TDoubleVector" use="required"/>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="Frames" type="TFrameCollection" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="AttachmentPoints" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation>Deprecated, use Frames instead.</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="AttachmentPoint" minOccurs="1" maxOccurs="unbounded">
+                  <xs:complexType>
+                    <xs:attributeGroup ref="Matrix4"/>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="AdditionalComponents" type="TGraphicComponentCollection" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Adds additional graphic components that are not part of the kinematic chain.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="ReplaceColors" type="TReplaceColorCollection" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="UserDefinedJointPositions" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>Adds additional predefined joint positions.</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="JointPosition" minOccurs="1" maxOccurs="unbounded">
+                  <xs:annotation>
+                    <xs:documentation>Adds a predefined joint position.</xs:documentation>
+                  </xs:annotation>
+                  <xs:complexType>
+                    <xs:attribute name="name" type="TName" use="required"/>
+                    <xs:attribute name="value" type="TDoubleVector" use="required">
+                      <xs:annotation>
+                        <xs:documentation>Joint values, one for each active joint.</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:all>
+        <xs:attribute name="source" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>Deprecated. Load the mechanism from an old-style txt file.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="type" type="TMechanismType" use="required"/>
+        <xs:attribute name="modelName" type="xs:string" use="optional">
+          <xs:annotation>
+            <xs:documentation>
+              Defines a model name for the mechanism, see Mechanism.ModelName.
+              This is used for identifying the product in various places, such as when creating a virtual controller from layout (cf. ControllerTemplates.xsd).
+              Robot variant that differ slightly and have the same RobotWare feature should typically have the same model name.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="kinematicsFlags" use="optional">
+          <xs:annotation>
+            <xs:documentation></xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:list itemType="TKinematicsFlags"/>
+          </xs:simpleType>
+        </xs:attribute>
+        <!--xs:attribute name="mass" type="xs:double" use="optional"/-->
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+
+  <!-- Cable -->
+  <xs:complexType name="TCable">
+    <xs:annotation>
+      <xs:documentation>Defines a physics cable.</xs:documentation>
+    </xs:annotation>
+    <xs:all>
+      <xs:element name="ControlPoints">
+        <xs:annotation>
+          <xs:documentation>Defines points through which the cable is routed when it is created, and how it is attached to other objects.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:choice minOccurs="2" maxOccurs="unbounded">
+            <xs:element name="ControlPoint" type="TCableControlPoint"/>
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+    </xs:all>
+    <xs:attribute name="name" type="TName" use="optional">
+    </xs:attribute>
+    <xs:attribute name="radius" type="xs:double" use="required">
+      <xs:annotation>
+        <xs:documentation>Radius of the cable.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="maxSegmentLength" type="xs:double" use="required">
+      <xs:annotation>
+        <xs:documentation>Approximate length of the discretized cable segments. A lower value will increase fidelity at the cost of performance.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="youngsModulus" type="xs:double" use="optional">
+      <xs:annotation>
+        <xs:documentation>Young's modulus that defines the stiffness of the cable.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="damping" type="xs:double" use="optional">
+      <xs:annotation>
+        <xs:documentation>Damping coefficient for the cable.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="color" type="TColor" use="optional">
+    </xs:attribute>
+    <xs:attribute name="desiredLength" type="xs:double" use="optional">
+      <xs:annotation>
+        <xs:documentation>The length of the cable, if longer than the total distance between the control points.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <!-- Station Logic -->
+
+  <xs:complexType name="TStation">
+    <xs:annotation>
+      <xs:documentation>Defines graphic components, signals, connections and bindings in a Station.</xs:documentation>
+    </xs:annotation>
+    <xs:all>
+      <xs:element name="Bindings" type="TBindingCollection" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="Signals" type="TIOSignalCollection" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="Connections" type="TConnectionCollection" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="GraphicComponents" type="TGraphicComponentCollection" minOccurs="0" maxOccurs="1"/>
+      <!-- TBD xs:element name="Frames" type="TFrameCollection" minOccurs="0"/-->
+    </xs:all>
+    <xs:attribute name="name" type="TName" use="optional"/>
+  </xs:complexType>
+
+  <!-- Root element -->
+
+  <xs:element name="GraphicComponent" abstract="true"/>
+  <xs:element name="Part" type="TPart" substitutionGroup="GraphicComponent"/>
+  <xs:element name="SmartComponent" type="TSmartComponent" substitutionGroup="GraphicComponent"/>
+  <xs:element name="GraphicComponentGroup" type="TGraphicComponentGroup" substitutionGroup="GraphicComponent"/>
+  <xs:element name="Mechanism" type="TMechanism" substitutionGroup="GraphicComponent"/>
+  <xs:element name="Station" type="TStation" substitutionGroup="GraphicComponent"/>
+
+</xs:schema>

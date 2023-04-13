@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema
+  targetNamespace="urn:abb-robotics-robotstudio-mechunitlibrarymap"
+  elementFormDefault="qualified"
+  xmlns="urn:abb-robotics-robotstudio-mechunitlibrarymap"   
+  xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="MechunitLibraryMap">
+    <xs:annotation>
+      <xs:documentation>
+        Specifies the RobotStudio model to load for a mechanical unit in a controller.
+        Used for both virtual controllers in RobotStudio stations and real controllers in Online Monitor.
+        If multiple entries match the controller configuration, the user will be prompted to choose a model.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" name="Mechunit">
+          <xs:annotation>
+            <xs:documentation></xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:attribute name="type" type="xs:string" use="required">
+              <xs:annotation>
+                <xs:documentation>
+                  The configuration value in the controller configuration database used to identify the mechanism model.
+                  For paint robots this is the value of "robot_serial_number_high_part", and for all other mechanisms it is the value of "use_robot_type" (without the "ROBx_" prefix).
+                </xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="library" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>
+                  Specifies the relative path and file name of the library file (.rslib) that should be loaded for the mechanical unit. The file name can contain wildcards (*). 
+                  If the file does not exist, the model can be generated dynamically if a file named LibraryTemplates.xml exists in the path.
+                  LibraryTemplates.xml must adhere to the LibraryCompiler schema and contain a Library or Variant entry that matches the file name.
+                </xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="hidden" type="xs:boolean" use="optional">
+              <xs:annotation>
+                <xs:documentation>Internal use</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="libraryType" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>
+                  Specifies that the model should be selected using a dialog that lets the user configure different variants.
+                  The value consists of two or three parts separated by semicolon: 1) The path and file name of an xml file that adheres to the LibraryTypes schema,
+                  2) An XPath expression that identifies a LibraryType element in the xml file, and 3) (optional) a conditional expression that can be used filter
+                  variants (using the value of Attribute elements in the LibraryType xml). 
+                  Example: libraryType="Tracks\LibraryTypes.xml;//LibraryType[@id='IRBT2005'];{variant}!=TRF"
+                </xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="carriedirbtype" type="xs:string" use="optional">
+              <xs:annotation>
+                <xs:documentation>
+                  Specifies the type or types of robots that are supported on a track.
+                  Should be the family name without prefix and separated by semicolon, for example "6600;6650".
+                </xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="length" type="xs:decimal" use="optional">
+              <xs:annotation>
+                <xs:documentation>Specifies the travel length in meters for a track model.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

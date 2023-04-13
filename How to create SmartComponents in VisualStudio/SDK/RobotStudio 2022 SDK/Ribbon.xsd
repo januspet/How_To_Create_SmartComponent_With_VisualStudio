@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<xs:schema id="Ribbon" 
+          targetNamespace="urn:abb-robotics-robotstudio-ribbon"
+          elementFormDefault="qualified"
+          xmlns="urn:abb-robotics-robotstudio-ribbon"
+          xmlns:mstns="urn:abb-robotics-robotstudio-ribbon"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:simpleType name="TLayout">
+    <xs:annotation>
+      <xs:documentation>
+        Specifies the layout of an element.
+        The layout may depend on the compacting state of the ribbon group. Separate the layout types by ';'.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="(Large|Small|Icon|SmallCentered|IconCentered|ButtonRow1|ButtonRow2|ButtonRow3|Inline)(;(Large|Small|Icon|SmallCentered|IconCentered|ButtonRow1|ButtonRow2|ButtonRow3|Inline|Hidden))?(;(Large|Small|Icon|SmallCentered|IconCentered|ButtonRow1|ButtonRow2|ButtonRow3|Inline|Hidden))?"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TVisibility">
+    <xs:annotation>
+      <xs:documentation>
+        Specifies the visibility of an element.
+        The visibility may depend on the compacting state of the ribbon group. Separate the visibilities by ';'.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="(True|False)(;(True|False))?(;(True|False))?"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="THeader">
+    <xs:annotation>
+      <xs:documentation>
+        Adds a header text.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="caption" type="xs:string" use="required"></xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TSeparator">
+    <xs:annotation>
+      <xs:documentation>
+        Adds a separator.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="visible" type="TVisibility" use="optional"></xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TControl">
+    <xs:annotation>
+      <xs:documentation>
+        Adds an existing control.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="id" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          ID of the control. The control must exist in the UIEnvironment.CommandBarControls collection.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="layout" type="TLayout" use="required"></xs:attribute>
+    <xs:attribute name="keytip" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies a keytip for the control.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="internal" type="xs:boolean" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          ABB internal use.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TGroup">
+    <xs:annotation>
+      <xs:documentation>
+        Specifies a RibbonGroup that represents a group of controls in a ribbon tab.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="Control" type="TControl"/>
+        <xs:element name="Separator" type="TSeparator"/>
+        <xs:element name="Header" type="THeader"/>
+      </xs:choice>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies an identifier for a new group, or the identifier of an existing or shared group.
+          The RibbonGroup object can be accessed from the RibbonTab.Groups collection.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="caption" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies the group caption.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="imageId" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies an alternative image for the group.
+          The image is displayed when the group is compacted to a button.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="button" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies an optional button placed in the group header to the right.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="TTab">
+    <xs:annotation>
+      <xs:documentation>Specifies a RibbonTab object that represents a tab in the ribbon</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Group" type="TGroup" minOccurs="0" maxOccurs="unbounded">
+      </xs:element>
+      <xs:element name="CompactingOrder" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            Specifies the order in which groups should be compacted when needed.
+            Groups are specified by their ID and separated by ';'. Each group may occur three times.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies an unique identifier for a new tab, or the identifier of an existing tab.
+          The standard tab IDs are: Home, Modeling, Simulation, Controller, RAPID and AddIns.
+          The RibbonTab object can be accessed from the UIEnvironment.RibbonTabs collection.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="caption" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies the tab caption.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="visible" type="xs:boolean" use="optional"/>
+  </xs:complexType>
+
+  <xs:complexType name="TContextTabGroup">
+    <xs:annotation>
+      <xs:documentation>
+        Specifies a RibbonContextTabGroup which represents a one or more tabs that are displayed when an object of the specified type is selected.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Tab" type="TTab" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="type" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Name of the type that the tab group corresponds to.
+          The RibbonContextTabGroup object can be referenced by calling the RibbonContextTabGroup.FromSelectionType() method.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="caption" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies the group caption.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="color" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>
+          Specifies the color of the tab group.
+          Must be either a string corresponding to a System.Drawing.KnownColor, or an RGB triplet separated by ';'.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <!--xs:attribute name="sticky" type="xs:boolean" use="optional"/-->
+  </xs:complexType>
+
+  <xs:element name="Ribbon">
+    <xs:annotation>
+      <xs:documentation>For creating and ribbon tabs or adding items to existing tabs</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="SharedGroups" minOccurs="0" maxOccurs="1">
+          <xs:annotation>
+            <xs:documentation>
+              Specifies tab groups that may be shared between multiple tabs.
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Group" type="TGroup" minOccurs="0" maxOccurs="unbounded"></xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Tabs" minOccurs="0" maxOccurs="1">
+          <xs:annotation>
+            <xs:documentation>
+              Specifies tabs in the ribbon
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Tab" type="TTab" minOccurs="1" maxOccurs="unbounded"></xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ContextGroups" minOccurs="0" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ContextGroup" type="TContextTabGroup" minOccurs="1" maxOccurs="unbounded"></xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

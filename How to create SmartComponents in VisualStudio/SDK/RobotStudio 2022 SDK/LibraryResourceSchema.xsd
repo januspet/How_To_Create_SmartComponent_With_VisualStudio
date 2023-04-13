@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="LibraryResource"
+    targetNamespace="urn:abb-robotics-robotstudio-libraryresource"
+    elementFormDefault="qualified"
+    xmlns="urn:abb-robotics-robotstudio-libraryresource"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:complexType name="TDynamicPropertyResource">
+    <xs:annotation>
+      <xs:documentation>Contains localized resources for a DynamicProperty.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="name" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>The name of the DynamicProperty.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="description" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>A localized description of the property for display in the user interface.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="caption" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>A localized caption for the property for display in the user interface.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="group" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>A localized group name for the property, that can be used to group properties.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+	<xs:complexType name="TIOSignalResource">
+    <xs:annotation>
+      <xs:documentation>Contains localized resources for an IOSignal.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="name" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>The name of the IOSignal.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="description" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>A localized description of the signal for display in the user interface.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="caption" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>A localized caption for the signal for display in the user interface.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="group" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>A localized group name for the signal, that can be used to group signals.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+	<xs:complexType name="TStringResource">
+    <xs:annotation>
+      <xs:documentation>A generic string resource, that can be obtained by calling SmartComponent.GetResourceString().</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="id" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>A unique identifier for the string.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="value" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>The localized string.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="TSmartComponentResource">
+    <xs:annotation>
+      <xs:documentation>Contains localized strings for a SmartComponent.</xs:documentation>
+    </xs:annotation>
+		<xs:sequence>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="DynamicProperty" type="TDynamicPropertyResource"/>
+				<xs:element name="IOSignal" type="TIOSignalResource"/>
+				<xs:element name="String" type="TStringResource"/>
+			</xs:choice>
+		</xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>The name of the SmartComponent. This must match the name of the component in the rsxml definition.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="description" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>A localized description of the SmartComponent.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+	</xs:complexType>
+	
+	<xs:element name="LibraryResource">
+    <xs:annotation>
+      <xs:documentation>
+        Contains localized UI strings for one or more SmartComponents.
+        When a SmartComponent is built, the resources for each language are added as an Asset named Resources.&lt;language-id&gt;.xml to the component.
+        During runtime when a localized string is requested, the resources are retrieved from the language-specific Asset.
+      </xs:documentation>
+    </xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="SmartComponent" type="TSmartComponentResource" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+</xs:schema>

@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="RobotStudioAddin"
+					 targetNamespace="urn:abb-robotics-robotstudio-addin"
+					 elementFormDefault="qualified"
+					 xmlns="urn:abb-robotics-robotstudio-addin"
+           xmlns:controls="urn:abb-robotics-robotstudio-commandbarcontrols"
+           xmlns:ribbon="urn:abb-robotics-robotstudio-ribbon"
+					 xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:xlink="http://www.w3.org/1999/xlink"
+           version="1.0">
+
+  <xs:element name="RobotStudioAddIn">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="ApplicationId" type="xs:string" minOccurs="0">
+          <xs:annotation>
+            <xs:appinfo>
+              <schemaDoc xmlns="http://schemas.xsddoc.codeplex.com/schemaDoc/2009/3"
+                     xmlns:ddue="http://ddue.schemas.microsoft.com/authoring/2003/5">
+                <ddue:summary>
+                  <ddue:para>
+                    Specifies a unique identifier of the add-in.
+                  </ddue:para>
+                </ddue:summary>
+                <ddue:remarks>
+                  <ddue:content>
+                    <ddue:para>
+                      The identifier shall follow the format specified in the section <ddue:link xlink:href="491b290b-86f8-4045-a61a-a4fb47a81295"/>
+                      When an add-in has an identity RobotStudio can manage different versions of the add-in.
+                    </ddue:para>
+                    <ddue:table>
+                      <ddue:tableHeader>
+                        <ddue:row>
+                          <ddue:entry>
+                            <ddue:para>.rspak</ddue:para>
+                          </ddue:entry>
+                          <ddue:entry>
+                            <ddue:para>Legacy</ddue:para>
+                          </ddue:entry>
+                        </ddue:row>
+                      </ddue:tableHeader>
+                      <ddue:row>
+                        <ddue:entry>
+                          <ddue:para>The Id is required.</ddue:para>
+                        </ddue:entry>
+                        <ddue:entry>
+                          <ddue:para>It is recommended but optional to specify an Id. If multiple add-ins with the same identifier are found, only the first one is loaded. </ddue:para>
+                          <ddue:para>For PowerPacs the ApplicationId is required.</ddue:para>
+                        </ddue:entry>
+                      </ddue:row>
+                    </ddue:table>
+                  </ddue:content>
+                </ddue:remarks>
+                <ddue:relatedTopics>
+                  <xmlEntityReference>urn:abb-robotics-robotstudio-addin#E/RobotStudioAddIn/MinimumHostVersion</xmlEntityReference>
+                  <xmlEntityReference>urn:abb-robotics-robotstudio-addin#E/RobotStudioAddIn/MaximumHostVersion</xmlEntityReference>
+                </ddue:relatedTopics>
+              </schemaDoc>
+              <xs:documentation></xs:documentation>
+            </xs:appinfo>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="DisplayName" type="xs:string" minOccurs="0">
+          <xs:annotation>
+            <xs:appinfo>
+              <schemaDoc xmlns="http://schemas.xsddoc.codeplex.com/schemaDoc/2009/3"
+                     xmlns:ddue="http://ddue.schemas.microsoft.com/authoring/2003/5">
+                <ddue:summary>
+                  <ddue:para>
+                    Specifies a name of the add-in that will be used by the RobotStudio user interface.
+                  </ddue:para>
+                </ddue:summary>
+                <ddue:remarks>
+                  <ddue:content>
+                    <ddue:para>
+                      The DisplayName is often concatenated with the value of the <xmlEntityReference>urn:abb-robotics-robotstudio-addin#E/RobotStudioAddIn/DisplayVersion</xmlEntityReference>.
+                      It is displayed for example when installed add-ins are listed and when logging information about activation or deactivation of PowerPacs.
+                    </ddue:para>
+                    <ddue:alert class="note">
+                      <ddue:para>
+                        This value may not contain version information. For version information use <xmlEntityReference>urn:abb-robotics-robotstudio-addin#E/RobotStudioAddIn/DisplayVersion</xmlEntityReference>.
+                      </ddue:para>
+                    </ddue:alert>
+                  </ddue:content>
+                </ddue:remarks>
+              </schemaDoc>
+            </xs:appinfo>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="DisplayVersion" type="xs:string" minOccurs="0">
+          <xs:annotation>
+            <xs:appinfo>
+              <schemaDoc xmlns="http://schemas.xsddoc.codeplex.com/schemaDoc/2009/3"
+                     xmlns:ddue="http://ddue.schemas.microsoft.com/authoring/2003/5">
+                <ddue:summary>
+                  <ddue:para>
+                    Specifies a user friendly version string to be displayed in the RobotStudio user interface. It is often concatenated with the value of the <xmlEntityReference>urn:abb-robotics-robotstudio-addin#E/RobotStudioAddIn/DisplayName</xmlEntityReference>.
+                    If not specified, the <ddue:codeEntityReference>T:System.Diagnostics.FileVersionInfo</ddue:codeEntityReference> of the <xmlEntityReference linkText="assembly file">urn:abb-robotics-robotstudio-addin#E/RobotStudioAddIn/Assembly/FileName</xmlEntityReference>  is used instead.
+                  </ddue:para>
+                </ddue:summary>
+              </schemaDoc>
+            </xs:appinfo>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="Description" type="xs:string" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>
+              A description of the add-in that is displayed in the RobotStudio user interface.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="Image" type="xs:string" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>A 32x32 pixel image (.png or .bmp) that represents the add-in. For example it is used in the user interface for the activation and deactivation of PowerPacs.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="StartPage" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>For ABB Internal use only.</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+            </xs:sequence>
+            <xs:attribute name="show" type="xs:boolean" default="true">
+            </xs:attribute>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="AddInType">
+          <xs:annotation>
+            <xs:documentation>
+              Specifies the type of add-in.
+            </xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="Internal">
+                <xs:annotation>
+                  <xs:documentation>For ABB internal use only.</xs:documentation>
+                </xs:annotation>
+              </xs:enumeration>
+              <xs:enumeration value="PowerPac">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <schemaDoc xmlns="http://schemas.xsddoc.codeplex.com/schemaDoc/2009/3"
+                           xmlns:ddue="http://ddue.schemas.microsoft.com/authoring/2003/5">
+                      <ddue:summary>
+                        <ddue:para>
+                          An Add-in that complies with the PowerPac contract specified by the <ddue:codeEntityReference>T:ABB.Robotics.RobotStudio.HostedAddInBase</ddue:codeEntityReference> abstract base class.
+                        </ddue:para>
+                      </ddue:summary>
+                    </schemaDoc>
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:enumeration>
+              <xs:enumeration value="General">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <schemaDoc xmlns="http://schemas.xsddoc.codeplex.com/schemaDoc/2009/3"
+                           xmlns:ddue="http://ddue.schemas.microsoft.com/authoring/2003/5">
+                      <ddue:summary>
+                        <ddue:para>
+                          An add-in that is not a PowerPac.
+                        </ddue:para>
+                      </ddue:summary>
+                    </schemaDoc>
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:enumeration>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element name="LicenseFeature" type="xs:string" minOccurs="0">
+          <xs:annotation>
+            <xs:appinfo>
+              <schemaDoc xmlns="http://schemas.xsddoc.codeplex.com/schemaDoc/2009/3"
+                     xmlns:ddue="http://ddue.schemas.microsoft.com/authoring/2003/5">
+                <ddue:summary>
+                  <ddue:para>
+                    Specifies a license feature that is required to enable the add-in. The purpose of this element is to provide a user experience where the user does not need to load the add-in to find out if it requires a feature or not.
+                  </ddue:para>
+                </ddue:summary>
+                <ddue:relatedTopics>
+                  <ddue:codeEntityReference>ABB.Robotics.RobotStudio.LicenseValidator</ddue:codeEntityReference>
+                </ddue:relatedTopics>
+                <ddue:remarks>
+                  <ddue:content>
+                    <ddue:para>
+                      The Add-In must also check the presence of the feature in its initialization code.
+                    </ddue:para>
+                  </ddue:content>
+                </ddue:remarks>
+              </schemaDoc>
+            </xs:appinfo>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="TrialLicenseFile" type="xs:string" minOccurs="0">
+          <xs:annotation>
+            <xs:appinfo>
+              <schemaDoc xmlns="http://schemas.xsddoc.codeplex.com/schemaDoc/2009/3"
+           xmlns:ddue="http://ddue.schemas.microsoft.com/authoring/2003/5">
+                <ddue:summary>
+                  <ddue:para>
+                    This element is obsolete and should no longer be used.
+                  </ddue:para>
+                </ddue:summary>
+              </schemaDoc>
+            </xs:appinfo>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="MinimumHostVersion" type="xs:string" minOccurs="0">
+          <xs:annotation>
+            <xs:appinfo>
+              <schemaDoc xmlns="http://schemas.xsddoc.codeplex.com/schemaDoc/2009/3"
+           xmlns:ddue="http://ddue.schemas.microsoft.com/authoring/2003/5">
+                <ddue:summary>
+                  <ddue:para>
+                    Specifies the minimum RobotStudio version supported by the add-in, in the form Major.Minor[.Build[.Revision]]
+                  </ddue:para>
+                </ddue:summary>
+                <ddue:remarks>
+                  <ddue:content>
+                    <ddue:para>
+                      RobotStudio does not load the add-in if the RobotStudio version is outside the range specified by the <xmlEntityReference>urn:abb-robotics-robotstudio-addin#E/RobotStudioAddIn/MinimumHostVersion</xmlEntityReference> and <xmlEntityReference>urn:abb-robotics-robotstudio-addin#E/RobotStudioAddIn/MaximumHostVersion</xmlEntityReference> elements.
+                    </ddue:para>
+                  </ddue:content>
+                </ddue:remarks>
+              </schemaDoc>
+            </xs:appinfo>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="MaximumHostVersion" type="xs:string" minOccurs="0">
+          <xs:annotation>
+            <xs:appinfo>
+              <schemaDoc xmlns="http://schemas.xsddoc.codeplex.com/schemaDoc/2009/3"
+           xmlns:ddue="http://ddue.schemas.microsoft.com/authoring/2003/5">
+                <ddue:summary>
+                  <ddue:para>
+                    Specifies the maximum RobotStudio version supported by the add-in, in the form Major.Minor[.Build[.Revision]]
+                  </ddue:para>
+                </ddue:summary>
+                <ddue:remarks>
+                  <ddue:content>
+                    <ddue:para>
+                      RobotStudio does not load the add-in if the RobotStudio version is outside the range specified by the <xmlEntityReference>urn:abb-robotics-robotstudio-addin#E/RobotStudioAddIn/MinimumHostVersion</xmlEntityReference> and <xmlEntityReference>urn:abb-robotics-robotstudio-addin#E/RobotStudioAddIn/MaximumHostVersion</xmlEntityReference> elements.
+                    </ddue:para>
+                  </ddue:content>
+                </ddue:remarks>
+              </schemaDoc>
+            </xs:appinfo>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="Assembly">
+          <xs:annotation>
+            <xs:documentation>
+              Specifies information about the main assembly of the add-in. This assembly contains the entry point called by RobotStudio to initialize the add-in.
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="FileName" type="xs:string">
+                <xs:annotation>
+                  <xs:documentation>Specifies the file name of the assembly that contains the add-in entry point.</xs:documentation>
+                </xs:annotation>
+              </xs:element>
+              <xs:element name="Path" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                  <xs:documentation>
+                    Additional path(s) to search if the assembly or its dependencies is not found in the same directory as the .rsaddin file.
+                    For legacy-add-ins Common folder paths can be used by prefixing the path with a .NET SpecialFolder surrounded by dollar signs, for example
+                    $ProgramFiles$\MyAddin.
+                    .rspak-add-ins only one path is allowed and it is relative to the <![CDATA[<addin-root>]]> folder.
+                  </xs:documentation>
+                </xs:annotation>
+              </xs:element>
+              <xs:element name="Entrypoint" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                  <xs:documentation>
+                    Specifies the entry point for the add-in.
+                    For a PowerPac add-in, this must be a class that inherits HostedAddInBase.
+                    For a general add-in, this must be a static parameter less method. If this element is not specified, the assembly must implement the method static public void AddinMain().
+                  </xs:documentation>
+                </xs:annotation>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="DocumentProviders" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Path" type="xs:string">
+                <xs:annotation>
+                  <xs:documentation>
+                    Only used for legacy-add-ins. Specifies the fully qualified path to the XML file that contains the description of one or more Document providers. The XML file must conform to the DocumentProvider Schema.
+                    Common folder paths can be used by prefixing the path with a .NET SpecialFolder surrounded by dollar signs, for example
+                    $ProgramFiles$\MyAddin\MyProviders.xml.
+                  </xs:documentation>
+                  <xs:documentation>
+                    For .rspak-addins RobotStudio will create document providers for the content in <![CDATA[<rspak-root>/Libraries]]>.
+                  </xs:documentation>
+                </xs:annotation>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Dependencies">
+          <xs:annotation>
+            <xs:appinfo>
+              <schemaDoc xmlns="http://schemas.xsddoc.codeplex.com/schemaDoc/2009/3"
+           xmlns:ddue="http://ddue.schemas.microsoft.com/authoring/2003/5">
+                <ddue:summary>
+                  <ddue:para>
+                    Specifies which RobotStudio sub systems the add-in requires.
+                  </ddue:para>
+                </ddue:summary>
+                <ddue:remarks>
+                  <ddue:content>
+                    <ddue:para>
+                      The RobotStudio functionality is divided in two different sub systems, Online and Station. When RobotStudio is started none of the sub systems are loaded into memory before it is required by user interaction.
+                      Loading an add-in that has a dependency on a sub system will cause the sub system to be loaded.
+                      In order to keep the startup time short RobotStudio does not load add-ins that is dependent on a subsystem before the sub system is loaded into RobotStudio.
+                    </ddue:para>
+                  </ddue:content>
+                </ddue:remarks>
+              </schemaDoc>
+            </xs:appinfo>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="None">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <schemaDoc xmlns="http://schemas.xsddoc.codeplex.com/schemaDoc/2009/3"
+                 xmlns:ddue="http://ddue.schemas.microsoft.com/authoring/2003/5">
+                      <ddue:summary>
+                        <ddue:para>
+                          The add-in has no dependency on a sub system and will be loaded as soon as RobotStudio is started.
+                        </ddue:para>
+                      </ddue:summary>
+                      <ddue:remarks>
+                        <ddue:content>
+                          <ddue:para>
+                            The add-in is only loaded automatically at RobotStudio startup if the AutoLoad option for the add-in is set to true in the RobotStudio <ddue:codeEntityReference linkText="Options">T:ABB.Robotics.RobotStudio.Options</ddue:codeEntityReference>.
+                            See also <xmlEntityReference>urn:abb-robotics-robotstudio-addin#E/RobotStudioAddIn/AutoLoad</xmlEntityReference>
+                          </ddue:para>
+                        </ddue:content>
+                      </ddue:remarks>
+                    </schemaDoc>
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:enumeration>
+              <xs:enumeration value="Station">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <schemaDoc xmlns="http://schemas.xsddoc.codeplex.com/schemaDoc/2009/3"
+                 xmlns:ddue="http://ddue.schemas.microsoft.com/authoring/2003/5">
+                      <ddue:summary>
+                        <ddue:para>
+                          The add-in is dependent on the Station sub system and will be loaded when that sub system is loaded.
+                        </ddue:para>
+                      </ddue:summary>
+                      <ddue:remarks>
+                        <ddue:content>
+                          <ddue:para>
+                            The add-in is only loaded automatically when the sub system is loaded if the AutoLoad option for the add-in is set to true in the RobotStudio <ddue:codeEntityReference linkText="Options">T:ABB.Robotics.RobotStudio.Options</ddue:codeEntityReference>.
+                            See also <xmlEntityReference>urn:abb-robotics-robotstudio-addin#E/RobotStudioAddIn/AutoLoad</xmlEntityReference>
+                          </ddue:para>
+                        </ddue:content>
+                      </ddue:remarks>
+                    </schemaDoc>
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:enumeration>
+              <xs:enumeration value="Online">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <schemaDoc xmlns="http://schemas.xsddoc.codeplex.com/schemaDoc/2009/3"
+                 xmlns:ddue="http://ddue.schemas.microsoft.com/authoring/2003/5">
+                      <ddue:summary>
+                        <ddue:para>
+                          The add-in is dependent on the Online sub system and will be loaded when that sub system is loaded.
+                        </ddue:para>
+                      </ddue:summary>
+                      <ddue:remarks>
+                        <ddue:content>
+                          <ddue:para>
+                            The add-in is only loaded automatically when the sub system is loaded if the AutoLoad option for the add-in is set to true in the RobotStudio <ddue:codeEntityReference linkText="Options">T:ABB.Robotics.RobotStudio.Options</ddue:codeEntityReference>.
+                            See also <xmlEntityReference>urn:abb-robotics-robotstudio-addin#E/RobotStudioAddIn/AutoLoad</xmlEntityReference>
+                          </ddue:para>
+                        </ddue:content>
+                      </ddue:remarks>
+                    </schemaDoc>
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:enumeration>
+              <xs:enumeration value="Station,Online">
+                <xs:annotation>
+                  <xs:appinfo>
+                    <schemaDoc xmlns="http://schemas.xsddoc.codeplex.com/schemaDoc/2009/3"
+                 xmlns:ddue="http://ddue.schemas.microsoft.com/authoring/2003/5">
+                      <ddue:summary>
+                        <ddue:para>
+                          The add-in is dependent on the Online and Station sub systems and will be loaded when both sub systems are loaded.
+                        </ddue:para>
+                      </ddue:summary>
+                      <ddue:remarks>
+                        <ddue:content>
+                          <ddue:para>
+                            The add-in is only loaded automatically when the sub system is loaded if the AutoLoad option for the add-in is set to true in the RobotStudio <ddue:codeEntityReference linkText="Options">T:ABB.Robotics.RobotStudio.Options</ddue:codeEntityReference>.
+                            See also <xmlEntityReference>urn:abb-robotics-robotstudio-addin#E/RobotStudioAddIn/AutoLoad</xmlEntityReference>
+                          </ddue:para>
+                        </ddue:content>
+                      </ddue:remarks>
+                    </schemaDoc>
+                  </xs:appinfo>
+                </xs:annotation>
+              </xs:enumeration>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element name="Platform" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>
+              Specifies the CPU architecture supported by this add-in and its dependencies.
+            </xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="x86"/>
+              <xs:enumeration value="x64"/>
+              <xs:enumeration value="Any"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element name="Documents" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>
+              Specifies documents that are added to the Add-ins help menu for legacy (non-rspak) add-ins.
+              For .rspak add-ins, this element is ignored.
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Document" minOccurs="0">
+                <xs:complexType>
+                  <xs:attribute name="uri" type="xs:string" use="required">
+                    <xs:annotation>
+                      <xs:documentation>File name relative to the add-in directory, or an URL to documentation on the web.</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="title" type="xs:string" use="required"/>
+                  <xs:attribute name="description" type="xs:string" use="optional"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:all>
+
+      <xs:attribute name="autoLoad" type="xs:boolean" default="false">
+        <xs:annotation>
+          <xs:appinfo>
+            <schemaDoc xmlns="http://schemas.xsddoc.codeplex.com/schemaDoc/2009/3"
+                   xmlns:ddue="http://ddue.schemas.microsoft.com/authoring/2003/5">
+              <ddue:summary>
+                <ddue:para>
+                  Specifies if the add-in should be loaded automatically when its dependencies have been initialized. 
+                </ddue:para>
+              </ddue:summary>
+              <ddue:remarks>
+                <ddue:content>
+                  <ddue:table>
+                      <ddue:tableHeader>
+                        <ddue:row>
+                          <ddue:entry>
+                            <ddue:para>.rspak</ddue:para>
+                          </ddue:entry>
+                          <ddue:entry>
+                            <ddue:para>Legacy</ddue:para>
+                          </ddue:entry>
+                        </ddue:row>
+                      </ddue:tableHeader>
+                      <ddue:row>
+                        <ddue:entry>
+                          <ddue:para>TBD</ddue:para>
+                        </ddue:entry>
+                        <ddue:entry>
+                          <ddue:para>
+                            When set to false the user have to explicitly load the add-in. The user interface exposes a setting for auto load true or false. This setting is persisted in the RobotStudio <ddue:codeEntityReference linkText="Options">T:ABB.Robotics.RobotStudio.Options</ddue:codeEntityReference>.
+                          </ddue:para>
+                        </ddue:entry>
+                      </ddue:row>
+                    </ddue:table>                  
+                </ddue:content>                
+              </ddue:remarks>
+              <ddue:relatedTopics>
+                <xmlEntityReference>urn:abb-robotics-robotstudio-addin#E/RobotStudioAddIn/Dependencies</xmlEntityReference>
+              </ddue:relatedTopics>            
+            </schemaDoc>
+          </xs:appinfo>
+          <xs:documentation></xs:documentation>
+          <xs:documentation>TBD .rspak</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
